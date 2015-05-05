@@ -1,0 +1,84 @@
+.actions{
+	margin-top: 10px;
+}
+
+#content{
+	margin-left: 150px;
+	margin-right: 150px;
+	margin-top: 15px;
+	width: 1040px;	
+}
+
+#registration{
+	width: 250px;
+}
+
+.scrollBar{
+	overflow: auto;
+	height: 145px;
+	width: 250px;
+}
+
+.borderedDiv{
+	border: 1px solid lightgray;
+	height: 475px;
+}
+
+.messageScroll{
+	overflow-x: hidden;
+	overflow-y: auto; 
+	height: 475px;
+}
+
+#topContent{
+	margin-bottom: 20px;
+	margin-right: 0px;
+}
+
+.messageScroll{
+	overflow: auto;
+	height: 475px;
+}
+
+.currentUser{
+	width: 250px;
+	height: 75px;
+	border-color:gray;
+	border: 1px solid lightgray;
+	border-radius: 5px 5px 5px 5px;
+	text-align: center;
+}
+
+#saveCurrentName{
+	display: none;
+	float: center;
+}
+
+ #changeName{
+	display: none;
+}
+
+.nick{
+	color: lightblue;
+}
+
+.exampleMessage{
+	display: none;
+}
+
+#editMessage{
+	display: none;
+}
+
+#saveMessage{
+	display: none;
+}
+
+#changeMessage{
+	display: none;
+}
+
+.message{
+	width: 500px;
+	border-color: green;
+}

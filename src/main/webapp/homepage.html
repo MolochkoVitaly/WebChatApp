@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<title>WebChat</title>
+		<meta charset='utf-8'> 
+		<link rel="stylesheet" href="resources/css/lib/bootstrap.min.css">
+		<link rel="stylesheet" href="resources/css/lib/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="resources/css/style.css">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<script src="resources/js/lib/jquery-1.11.2.min.js"></script>
+		<script type="text/javascript" src="resources/js/scripts.js"></script>
+	</head>
+	<body>
+		<div id="content">
+			<div class="row" id="topContent">
+		  	<div class="col-md-4">
+		  		<div class="panel panel-default" id="registration" >
+  					<div class="panel-heading">
+    					<h3 class="panel-title">Вход</h3>
+  					</div>
+  					<div class="panel-body">
+    					<form action="#">
+  							<div class="form-group">
+    							<label for="userLogin">Логин</label>
+    							<input type="text" class="form-control" id="userLogin" placeholder="Логин">
+  							</div>
+  							<button  type="submit" id="submitUser" class="btn btn-default btn-registration">Войти</button>
+						</form>
+  					</div>
+				</div>
+				<div class="currentUser">
+				    <h4 class="currentName">Имя пользователя</h4>
+				    <input type="text" class="form-control" id="changeName" disabled="true">
+					<button class="btn btn-primary btn-xs" id="changeCurrentName" type="submit" style="float: center">Изменить имя</button>
+					<button class="btn btn-primary btn-xs" id="saveCurrentName" type="submit">Изменить имя</button>
+				</div>
+				<h3>Пользователи online</h3>
+				<div class="well scrollBar">
+					<ul id="onlineArea">
+						<li id="onlineUser" style="display:none">Петя</li>
+					</ul>
+				</div>
+		  	</div>
+		  	<div class="col-md-8 borderedDiv messageScroll show" id="showMessage">
+			   <div class="exampleMessage" message-id="">
+				   	<p> 
+
+				     	<span class="nick">Ник:</span>
+
+				   	    <button style="float: right" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span> </button>
+				   	    <span style = "float: right"><a href="#" class="editMessage"><i class="fa fa-pencil-square-o"></i></a></span>
+						<span style = "float: right"><a href="#" class="saveMessage" style="display: none"><i class="fa fa-pencil-square-o"></i></a></span>
+				        <input type="text" class="form-control" id="changeMessage" disabled="true">
+					    <button class="btn btn-primary btn-xs" id="saveMessage" type="submit">Сохранить</button><br>	
+					    
+					    <span id="idMsg" class="message">сообщение</span>
+				    </p>
+
+
+
+			   </div>
+		  	</div>
+			</div>
+			<div class="well" >
+				<form  action="#">
+					<textarea id="messageArea" class="form-control" rows="2" placeholder="Введите Ваше сообщение" disabled="true"></textarea>
+					<div class="actions">
+						<button id="send" class="btn btn-primary" type="submit" disabled="true">Отправить</button>
+						<button class="btn btn-dunger" id="server" type="submit" style="float: right">server</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</body>
+</html>
