@@ -14,18 +14,24 @@ public final class MessageStorage {
         return HISTORY;
     }
 
-    public static void addMessage(Message message) {
-        boolean flag = true;
+    public static void addMessagePost(Message message) {
+        HISTORY.add(message);
+    }
+    public static void addMessageDelete(Message message) {
         for(int i=0; i < HISTORY.size(); i++){
             if(Integer.parseInt(HISTORY.get(i).getId()) == Integer.parseInt(message.getId())){
                 HISTORY.get(i).setMsgText(message.getMsgText());
                 HISTORY.get(i).isDelete();
                 HISTORY.get(i).setChangeDate();
-                flag = false;
             }
         }
-        if(flag){
-            HISTORY.add(message);
+    }
+    public static void addMessagePut(Message message) {
+        for(int i=0; i < HISTORY.size(); i++){
+            if(Integer.parseInt(HISTORY.get(i).getId()) == Integer.parseInt(message.getId())){
+                HISTORY.get(i).setMsgText(message.getMsgText());
+                HISTORY.get(i).setChangeDate();
+            }
         }
     }
 

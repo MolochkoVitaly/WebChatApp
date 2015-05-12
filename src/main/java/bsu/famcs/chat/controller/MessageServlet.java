@@ -64,7 +64,7 @@ public class MessageServlet extends HttpServlet {
             Message message = jsonToMessage(json);
             logger.info(message.getUserMessage());
             XMLHistoryUtil.addMessage(message);
-            MessageStorage.addMessage(message);
+            MessageStorage.addMessagePost(message);
             System.out.println(MessageStorage.getSize());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
@@ -73,7 +73,7 @@ public class MessageServlet extends HttpServlet {
         }
     }
 
-    /*@Override
+    @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("Put request");
         String data = getMessageBody(request);
@@ -84,7 +84,7 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(jsonObject);
             message.setChangeDate();
             Message updated = XMLHistoryUtil.updateMessage(message);
-            MessageStorage.addMessage(updated);
+            MessageStorage.addMessagePut(updated);
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -93,7 +93,7 @@ public class MessageServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Message with id : " + message.getId() + " doesn't exist or was deleted");
         }
-    }*/
+    }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -107,7 +107,7 @@ public class MessageServlet extends HttpServlet {
             message.isDelete();
             message.setChangeDate();
             Message updated = XMLHistoryUtil.updateMessage(message);
-            MessageStorage.addMessage(updated);
+            MessageStorage.addMessageDelete(updated);
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
