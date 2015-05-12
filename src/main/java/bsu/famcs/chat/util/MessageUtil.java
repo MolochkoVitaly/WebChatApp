@@ -53,7 +53,7 @@ public final class MessageUtil {
 
     public static Message jsonToMessage(JSONObject json) {
         String userName = (String)json.get(USER_NAME);
-        String msgText = (String)json.get(MSG_TEXT);
+        String msgText = ((String)json.get(MSG_TEXT)).trim();
         //String id = (String)json.get(ID);
         if (userName != null && msgText != null) {
             Message msg =  new Message(generateId(), userName, msgText, generateCurrentDate(), NOT_CHANGED, false);
@@ -64,7 +64,7 @@ public final class MessageUtil {
 
     public static Message jsonToCurrentMessage(JSONObject json) {
         String id = (String)json.get(ID);
-        String messageText = (String)json.get(MSG_TEXT);
+        String messageText = ((String)json.get(MSG_TEXT)).trim();
         String changeDate = (String)json.get(DELETED);
         if (changeDate == null) {
             changeDate = NOT_CHANGED;
