@@ -8,6 +8,7 @@ import org.json.simple.parser.ParseException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 public final class MessageUtil {
@@ -18,9 +19,10 @@ public final class MessageUtil {
     private static final String EN = "EN";
     private static final String USER_NAME = "userName";
     private static final String MSG_TEXT = "msgText";
-    //private static final String NOT_CHANGE = "not changed";
+    private static final String NOT_CHANGED = "not changed";
+    private static final String DELETED = "isDeleted";
     private static final String ID = "id";
-    private static int CURRENT_ID = 0;
+    //private static int CURRENT_ID = 0;
 
     private MessageUtil() {
     }
@@ -38,9 +40,9 @@ public final class MessageUtil {
         return String.valueOf(MessageStorage.getSize());
     }
 
-    private static String generateCurrentDate() {
+    public static String generateCurrentDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss");
-        //dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Minsk"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Minsk"));
         return dateFormat.format(new Date());
     }
 
@@ -54,8 +56,21 @@ public final class MessageUtil {
         String msgText = (String)json.get(MSG_TEXT);
         //String id = (String)json.get(ID);
         if (userName != null && msgText != null) {
-            Message msg =  new Message(generateId(), userName, msgText, generateCurrentDate());
+            Message msg =  new Message(generateId(), userName, msgText, generateCurrentDate(), NOT_CHANGED, false);
             return msg;
+        }
+        return null;
+    }
+
+    public static Message jsonToCurrentMessage(JSONObject json) {
+        String id = (String)json.get(ID);
+        String messageText = (String)json.get(MSG_TEXT);
+        String changeDate = (String)json.get(DELETED);
+        if (changeDate == null) {
+            changeDate = NOT_CHANGED;
+        }
+        if (id != null) {
+            return new Message(id, null, messageText, null, changeDate, false);
         }
         return null;
     }

@@ -1,31 +1,36 @@
 package bsu.famcs.chat.model;
-
+import bsu.famcs.chat.util.MessageUtil;
 
 public class Message {
     private final String id;
     private String userName;
     private String msgText;
     private String sendDate;
-    //private String changeDate;
-    //private boolean isDeleted;
+    private String changeDate;
+    private boolean isDeleted;
 
-    public Message(String id, String userName, String msgText, String sendDate) {
+    public Message(String id, String userName, String msgText, String sendDate,
+                   String changeDate, boolean isDeleted) {
         this.id = id;
         this.userName = userName;
         this.msgText = msgText;
         this.sendDate = sendDate;
-        //this.changeDate = changeDate;
-        //this.isDeleted = isDeleted;
+        this.changeDate = changeDate;
+        this.isDeleted = isDeleted;
     }
 
-    /*public void changed(String newMessageText) {
-        msgText = newMessageText;
-    }*/
+    public void setChangeDate() {
+        this.changeDate = MessageUtil.generateCurrentDate();
+    }
 
-    /*public void isDelete() {
+    public void setMsgText(String msgText){
+        this.msgText = msgText;
+    }
+
+    public void isDelete() {
         isDeleted = true;
-        msgText = "message has deleted.";
-    }*/
+        msgText = "isDeleted";
+    }
 
     public String getId() {
         return id;
@@ -43,13 +48,13 @@ public class Message {
         return sendDate;
     }
 
-    /*public String getChangeDate() {
+    public String getChangeDate() {
         return changeDate;
-    }*/
+    }
 
-    /*public boolean isDeleted() {
+    public boolean isDeleted() {
         return isDeleted;
-    }*/
+    }
 
     @Override
     public String toString() {
@@ -57,9 +62,9 @@ public class Message {
         sb.append("{\"msgText\":\"").append(msgText)
                 .append("\", \"userName\":\"").append(userName)
                 .append("\", \"id\":\"").append(id)
-                //.append("\", \"sendDate\":\"").append(sendDate)
-                //.append("\", \"changeDate\":\"").append(changeDate)
-                /*.append("\", \"isDeleted\":\"").append(isDeleted)*/.append("\"}");
+                .append("\", \"sendDate\":\"").append(sendDate)
+                .append("\", \"changeDate\":\"").append(changeDate)
+                .append("\", \"isDeleted\":\"").append(isDeleted).append("\"}");
         return sb.toString();
     }
 

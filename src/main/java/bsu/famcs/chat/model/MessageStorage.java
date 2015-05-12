@@ -15,7 +15,18 @@ public final class MessageStorage {
     }
 
     public static void addMessage(Message message) {
-        HISTORY.add(message);
+        boolean flag = true;
+        for(int i=0; i < HISTORY.size(); i++){
+            if(Integer.parseInt(HISTORY.get(i).getId()) == Integer.parseInt(message.getId())){
+                HISTORY.get(i).setMsgText(message.getMsgText());
+                HISTORY.get(i).isDelete();
+                HISTORY.get(i).setChangeDate();
+                flag = false;
+            }
+        }
+        if(flag){
+            HISTORY.add(message);
+        }
     }
 
     public static void addAll(List<Message> messages) {
