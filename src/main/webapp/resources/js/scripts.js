@@ -33,7 +33,6 @@ function restoreMessages(continueWith) {
         delegateEventServer();
         var response = JSON.parse(responseText);
 
-        //appState.token = response.token;
         createAllTasks(response.messages);
 
         continueWith && continueWith();
@@ -46,7 +45,6 @@ function updateMessages(continueWith) {
     get(url, function (responseText) {
         console.assert(responseText != null);
         delegateEventServer();
-        //debugger;
         var response = JSON.parse(responseText).messages;
         for (var i = 0; i < response.length; i++) {
             var message = response[i];
@@ -74,7 +72,6 @@ function createAllTasks(allTasks) {
 }
 
 function addAllMessages(message) {
-    debugger;
     if (appState.messageList[parseInt(message.id, 10)] == null) {
         task = message;
         messageDiv = $('.exampleMessage').first().clone();
@@ -88,15 +85,13 @@ function addAllMessages(message) {
 
 function addChangeMessage(message) {
     if (appState.messageList[message.id] != null) {
-        debugger;
-        $('.exampleMessage').find('.message')[parseInt(message.id) + 1]=message.msgText;
+        $('.exampleMessage').find('.message')[parseInt(message.id,10) + 1].innerText=message.msgText;
         appState.messageList[message.id] = message;
     }
 }
 
 function addDeleteMessage(message) {
     if (appState.messageList[message.id] != null) {
-        debugger;
         $('.exampleMessage').find('.message')[parseInt(message.id, 10) + 1].innerText=message.msgText;
         appState.messageList[message.id] = message;
     }
@@ -200,11 +195,10 @@ $(document).ready(function () {
         }
 
         if( $(this).closest('.exampleMessage').find('.message').html() == "isDeleted") {
-            alert("This message don't editable, so it was deleted");
+            alert("This message don't delete, so it was deleted");
             return;
         };
 
-        debugger;
         id = $(this).closest('.exampleMessage').attr('message-id');
         text= $(this).closest('.exampleMessage').find('.message').html();
         name = $(this).closest('.exampleMessage').find('.nick').html();
@@ -222,13 +216,6 @@ $(document).ready(function () {
             task = theMessage(message,$userName.html(),appState.messageList.length);
             storeMessages(task,
              function () {
-                /*appState.messageList.push(task);
-                messageDiv = $('.exampleMessage').first().clone();
-                messageDiv.find('.nick').html($userName.html() + ":");
-                messageDiv.find('.message').html(message);
-                messageDiv.attr('message-id', uniqueId());
-                $('#showMessage').append(messageDiv.show());
-                $('#messageArea').val('');*/
             });
             $('#messageArea').val('');
         };
@@ -239,7 +226,7 @@ $(document).ready(function () {
         if($userName.html() + ":" != $(this).closest('.exampleMessage').find('.nick').html()){
             return;
         }
-        if( $(this).closest('.exampleMessage').find('.message').html() == "isDeleted.") {
+        if( $(this).closest('.exampleMessage').find('.message').html() == "isDeleted") {
             alert("This message don't editable, so it was deleted");
             return;
         };
@@ -267,11 +254,9 @@ $(document).ready(function () {
         $input.hide();
         id = $(this).closest('.exampleMessage').attr('message-id');
         task = theMessage(editer,$p.find('.nick').html(),id);
-        debugger;
         changeMessages(task, function(){
-            $p.find('.message').html(task.msgText).show();
         });
-        //$p.find('.message').html(task.msgText).show();
+        $p.find('.message').show();
         $p.find('.nick').show();
         $(this).hide();
         $p.find('a.editMessage').show();
