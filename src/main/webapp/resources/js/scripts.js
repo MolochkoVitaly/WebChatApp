@@ -22,8 +22,6 @@ var appState = {
 function storeMessages(sendMessage, continueWith) {
     post(appState.mainUrl, JSON.stringify(sendMessage),
         function () {
-            //updateMessages();
-            restoreMessages();
     });
 }
 
@@ -35,7 +33,7 @@ function restoreMessages(continueWith) {
         delegateEventServer();
         var response = JSON.parse(responseText);
 
-        appState.token = response.token;
+        //appState.token = response.token;
         createAllTasks(response.messages);
 
         continueWith && continueWith();
@@ -48,22 +46,24 @@ function updateMessages(continueWith) {
     get(url, function (responseText) {
         console.assert(responseText != null);
         delegateEventServer();
+        //debugger;
         var response = JSON.parse(responseText).messages;
         for (var i = 0; i < response.length; i++) {
             var message = response[i];
-            if (message.request == "POST") {
+            if(message.changeDate == "not changed")
+            {
                 addAllMessages(message);
             }
-            if (message.request == "PUT") {
+            if (message.changeDate != "not changed" && message.isDeleted == 'false') {
                 addChangeMessage(message);
             }
-            if (message.request == "DELETE") {
+            if (message.isDeleted == 'true') {
                 addDeleteMessage(message);
             }
         }
         continueWith && continueWith();
     });
-    //setTimeout(updateMessages, 1000);
+    setTimeout(updateMessages, 1000);
 
 }
 
@@ -74,7 +74,8 @@ function createAllTasks(allTasks) {
 }
 
 function addAllMessages(message) {
-    if (appState.messageList[message.id] == null) {
+    debugger;
+    if (appState.messageList[parseInt(message.id, 10)] == null) {
         task = message;
         messageDiv = $('.exampleMessage').first().clone();
         messageDiv.find('.nick').html(task.userName + ":");
@@ -87,14 +88,16 @@ function addAllMessages(message) {
 
 function addChangeMessage(message) {
     if (appState.messageList[message.id] != null) {
-        $('.exampleMessage')[message.id + 1].getElementsByClassName('message')[0].innerHTML=message.message;
+        debugger;
+        $('.exampleMessage').find('.message')[parseInt(message.id) + 1]=message.msgText;
         appState.messageList[message.id] = message;
     }
 }
 
 function addDeleteMessage(message) {
     if (appState.messageList[message.id] != null) {
-        $('.exampleMessage')[message.id + 1].getElementsByClassName('message')[0].innerHTML=message.message;
+        debugger;
+        $('.exampleMessage').find('.message')[parseInt(message.id, 10) + 1].innerText=message.msgText;
         appState.messageList[message.id] = message;
     }
 }
@@ -109,15 +112,6 @@ function defaultErrorHandler(message) {
     $("#server").addClass('btn btn-danger');
 }
 
-function store(listToSave) {
-
-    if(typeof(Storage) == "undefined") {
-        alert('localStorage is not accessible');
-        return;
-    }
-
-    localStorage.setItem("Chat messageList", JSON.stringify(listToSave));
-}
 
 function restoreName(){
     if(typeof(Storage) == "undefined") {
@@ -136,15 +130,15 @@ function restoreName(){
 
 function changeMessages(changeMessage, continueWith) {
     put(appState.mainUrl, JSON.stringify(changeMessage), function () {
-        restoreMessages();
     });
 }
-function deleteMessage(index,continueWith) {
+
+function deleteMessage(index, msg, continueWith) {
  var indexToken = index*8+11; 
  var url = appState.mainUrl + '?token=' + "TN" +indexToken.toString() + "EN";
-    del(url, function () {
+    del(url, JSON.stringify(msg), function () {
 
-     continueWith && continueWith();
+        continueWith && continueWith();
     });
 }
 
@@ -154,15 +148,8 @@ $(document).ready(function () {
     $inputChange = $('#changeName');
 
     restoreMessages();
-    //updateMessages();
+    updateMessages();
     $userName.html(restoreName() || "Имя пользователя");
-
-    if($userName.html()!=""){
-        li = $('#onlineArea li').first().clone();
-        li.html($userName.html());
-        $('#onlineArea').append(li.show());
-
-    }
 
     //enter in chat
     $('#submitUser').click(function () {    
@@ -212,9 +199,17 @@ $(document).ready(function () {
             return;
         }
 
+        if( $(this).closest('.exampleMessage').find('.message').html() == "isDeleted") {
+            alert("This message don't editable, so it was deleted");
+            return;
+        };
+
+        debugger;
         id = $(this).closest('.exampleMessage').attr('message-id');
-        
-        deleteMessage(id,
+        text= $(this).closest('.exampleMessage').find('.message').html();
+        name = $(this).closest('.exampleMessage').find('.nick').html();
+        task = theMessage(text, name, id)
+        deleteMessage(id, task,
             function(){
             });
     })
@@ -227,13 +222,13 @@ $(document).ready(function () {
             task = theMessage(message,$userName.html(),appState.messageList.length);
             storeMessages(task,
              function () {
-                appState.messageList.push(task);
+                /*appState.messageList.push(task);
                 messageDiv = $('.exampleMessage').first().clone();
                 messageDiv.find('.nick').html($userName.html() + ":");
                 messageDiv.find('.message').html(message);
                 messageDiv.attr('message-id', uniqueId());
                 $('#showMessage').append(messageDiv.show());
-                $('#messageArea').val('');
+                $('#messageArea').val('');*/
             });
             $('#messageArea').val('');
         };
@@ -244,7 +239,7 @@ $(document).ready(function () {
         if($userName.html() + ":" != $(this).closest('.exampleMessage').find('.nick').html()){
             return;
         }
-        if( $(this).closest('.exampleMessage').find('.message').html() == "message has deleted.") {
+        if( $(this).closest('.exampleMessage').find('.message').html() == "isDeleted.") {
             alert("This message don't editable, so it was deleted");
             return;
         };
@@ -272,7 +267,8 @@ $(document).ready(function () {
         $input.hide();
         id = $(this).closest('.exampleMessage').attr('message-id');
         task = theMessage(editer,$p.find('.nick').html(),id);
-        changeMessages(task,function(){
+        debugger;
+        changeMessages(task, function(){
             $p.find('.message').html(task.msgText).show();
         });
         //$p.find('.message').html(task.msgText).show();
@@ -286,7 +282,6 @@ $(document).ready(function () {
                 continue;
 
             appState.messageList[i].msgText = editer;
-            store(appState.messageList);
 
             return;
             }
@@ -302,8 +297,8 @@ function post(url, data, continueWith, continueWithError) {
 function put(url, data, continueWith, continueWithError) {
     ajax('PUT', url, data, continueWith, continueWithError);
 }
-function del(url, continueWith, continueWithError) {
-    ajax('DELETE', url, null, continueWith, continueWithError);
+function del(url, data, continueWith, continueWithError) {
+    ajax('DELETE', url, data, continueWith, continueWithError);
 }
 function isError(text) {
     if (text == "")
