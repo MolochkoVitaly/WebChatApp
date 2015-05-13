@@ -271,6 +271,13 @@ $(document).ready(function () {
             return;
             }
     })
+
+    $('.smile').click(function () {
+        //alert($(this).html());
+        var smile = $(this).html();
+        var input =  $('#messageArea').val();
+        $('#messageArea').val(input + " " + smile);
+    })
 })
 
 function get(url, continueWith, continueWithError) {
