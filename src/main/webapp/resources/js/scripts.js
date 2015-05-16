@@ -16,7 +16,7 @@ var theMessage = function(text, user , value) {
 var appState = {
     mainUrl: 'chat',
     messageList:[],
-    token: 'TE11EN'
+    token: 'TE0EN'
 };
 
 function storeMessages(sendMessage, continueWith) {
@@ -24,6 +24,7 @@ function storeMessages(sendMessage, continueWith) {
         function () {
     });
 }
+
 
 function restoreMessages(continueWith) {
     var url = appState.mainUrl + '?token=' + appState.token;
@@ -37,6 +38,7 @@ function restoreMessages(continueWith) {
 
         continueWith && continueWith();
     });
+    document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
 }
 
 function updateMessages(continueWith) {
@@ -45,6 +47,7 @@ function updateMessages(continueWith) {
     get(url, function (responseText) {
         console.assert(responseText != null);
         delegateEventServer();
+        appState.token = JSON.parse(responseText).token;
         var response = JSON.parse(responseText).messages;
         for (var i = 0; i < response.length; i++) {
             var message = response[i];
@@ -62,13 +65,14 @@ function updateMessages(continueWith) {
         continueWith && continueWith();
     });
     setTimeout(updateMessages, 1000);
-
+    document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
 }
 
 function createAllTasks(allTasks) {
     for(var i = 0; i < allTasks.length; i++){
         addAllMessages(allTasks[i]);
     }
+    document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
 }
 
 function addAllMessages(message) {
@@ -129,7 +133,7 @@ function changeMessages(changeMessage, continueWith) {
 }
 
 function deleteMessage(index, msg, continueWith) {
- var indexToken = index*8+11; 
+ var indexToken = index;
  var url = appState.mainUrl + '?token=' + "TN" +indexToken.toString() + "EN";
     del(url, JSON.stringify(msg), function () {
 
@@ -143,6 +147,7 @@ $(document).ready(function () {
     $inputChange = $('#changeName');
 
     restoreMessages();
+    document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
     updateMessages();
     $userName.html(restoreName() || "Имя пользователя");
 
@@ -191,10 +196,11 @@ $(document).ready(function () {
     //delete message (only my msg)
     $('#showMessage').on('click', 'button.close', function () {
         if($userName.html() + ":" != $(this).closest('.exampleMessage').find('.nick').html()){
+            alert("You don't delete this message!");
             return;
         }
 
-        if( $(this).closest('.exampleMessage').find('.message').html() == "isDeleted") {
+        if($(this).closest('.exampleMessage').find('.message').html() == "isDeleted") {
             alert("This message don't delete, so it was deleted");
             return;
         };
@@ -219,6 +225,7 @@ $(document).ready(function () {
             });
             $('#messageArea').val('');
         };
+        document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
     })
 
     //edit message (only my msg)
@@ -231,9 +238,9 @@ $(document).ready(function () {
             return;
         };
 
-        $p = $(this).closest('.exampleMessage')
-        $message = $p.find('.message')
-        $input = $p.find('#changeMessage')
+        $p = $(this).closest('.exampleMessage');
+        $message = $p.find('.message');
+        $input = $p.find('#changeMessage');
         editer = $message.html();
         $message.hide();
         $p.find('.nick').hide();
@@ -247,8 +254,8 @@ $(document).ready(function () {
 
     //save edit message
     $('#showMessage').on('click', 'button#saveMessage', function () {
-        $p = $(this).closest('.exampleMessage')
-        $input = $p.find('#changeMessage')
+        $p = $(this).closest('.exampleMessage');
+        $input = $p.find('#changeMessage');
         editer = $input.val();
         $input.attr('disabled', true);
         $input.hide();
@@ -311,17 +318,21 @@ function ajax(method, url, data, continueWith, continueWithError) {
     xhr.open(method || 'GET', url, true);
 
     xhr.onload = function () {
+       
         if (xhr.readyState != 4)
             return;
 
-        if (xhr.status != 200) {
-            continueWithError('Error on the server side, response ' + xhr.status);
-            return;
-        }
+        if(xhr.status != 304) {
 
-        if (isError(xhr.responseText)) {
-            continueWithError('Error on the server side, response ' + xhr.responseText);
-            return;
+            if (xhr.status != 200) {
+                continueWithError('Error on the server side, response ' + xhr.status);
+                return;
+            }
+
+            if (isError(xhr.responseText)) {
+                continueWithError('Error on the server side, response ' + xhr.responseText);
+                return;
+            }
         }
 
         continueWith(xhr.responseText);
