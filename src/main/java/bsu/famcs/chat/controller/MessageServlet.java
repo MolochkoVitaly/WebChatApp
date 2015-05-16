@@ -4,6 +4,7 @@ import bsu.famcs.chat.model.Message;
 import bsu.famcs.chat.model.MessageStorage;
 import bsu.famcs.chat.storage.xml.XMLHistoryUtil;
 import bsu.famcs.chat.exception.MyException;
+import bsu.famcs.chat.util.MessageUtil;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -27,6 +28,7 @@ import static bsu.famcs.chat.util.ServletUtil.getMessageBody;
 @WebServlet("/chat")
 public class MessageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private int isModifiedStorage = 0;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
 
     @Override
@@ -41,13 +43,19 @@ public class MessageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter(TOKEN);
+        logger.info("Get request");
         if (token != null && !"".equals(token)) {
             int index = getIndex(token);
-            String messages = serverResponse(index);
-            response.setContentType(APPLICATION_JSON);
-            PrintWriter pw = response.getWriter();
-            pw.print(messages);
-            pw.flush();
+            if(isModifiedStorage == index && isModifiedStorage != 0) {
+                logger.info("GET request: response status: 304 Not Modified");
+                response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+            } else {
+                String messages = serverResponse(0);
+                response.setContentType(APPLICATION_JSON);
+                PrintWriter out = response.getWriter();
+                out.print(messages);
+                out.flush();
+            }
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
             logger.error("Token parameter is absent");
@@ -65,7 +73,8 @@ public class MessageServlet extends HttpServlet {
             logger.info(message.getUserMessage());
             XMLHistoryUtil.addMessage(message);
             MessageStorage.addMessagePost(message);
-            System.out.println(MessageStorage.getSize());
+            isModifiedStorage++;
+            //System.out.println(MessageStorage.getSize());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -85,6 +94,7 @@ public class MessageServlet extends HttpServlet {
             message.setChangeDate();
             Message updated = XMLHistoryUtil.updateMessage(message);
             MessageStorage.addMessagePut(updated);
+            isModifiedStorage++;
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -108,6 +118,7 @@ public class MessageServlet extends HttpServlet {
             message.setChangeDate();
             Message updated = XMLHistoryUtil.updateMessage(message);
             MessageStorage.addMessageDelete(updated);
+            isModifiedStorage++;
         } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -122,7 +133,7 @@ public class MessageServlet extends HttpServlet {
     private String serverResponse(int index) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(MESSAGES, MessageStorage.getSubHistory(index));
-        jsonObject.put(TOKEN, getToken(MessageStorage.getSize()));
+        jsonObject.put(TOKEN, getToken(isModifiedStorage));
         return jsonObject.toJSONString();
     }
 
