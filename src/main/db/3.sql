@@ -1,1 +1,1 @@
-SELECT * FROM messages WHERE date='2015-05-15';
+SELECT * FROM messages WHERE user_id=3 date='2015-05-02';
