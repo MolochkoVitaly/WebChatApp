@@ -22,7 +22,7 @@ var appState = {
 function storeMessages(sendMessage, continueWith) {
     post(appState.mainUrl, JSON.stringify(sendMessage),
         function () {
-    });
+        });
 }
 
 
@@ -133,8 +133,8 @@ function changeMessages(changeMessage, continueWith) {
 }
 
 function deleteMessage(index, msg, continueWith) {
- var indexToken = index;
- var url = appState.mainUrl + '?token=' + "TN" +indexToken.toString() + "EN";
+    var indexToken = index;
+    var url = appState.mainUrl + '?token=' + "TN" +indexToken.toString() + "EN";
     del(url, JSON.stringify(msg), function () {
 
         continueWith && continueWith();
@@ -152,7 +152,7 @@ $(document).ready(function () {
     $userName.html(restoreName() || "Имя пользователя");
 
     //enter in chat
-    $('#submitUser').click(function () {    
+    $('#submitUser').click(function () {
         if ($('#userLogin').val() != "") {
             userName = $('#userLogin').val();
             $userName.html(userName);
@@ -182,14 +182,14 @@ $(document).ready(function () {
     $('#saveCurrentName').click(function () {
         name = $inputChange.val();
         if (name != "") {
-        $inputChange.attr('disabled', true);
-        $inputChange.hide();
-        $userName.html(name);
-        $(this).hide();
-        $('#changeCurrentName').show()
-        $userName.show();
+            $inputChange.attr('disabled', true);
+            $inputChange.hide();
+            $userName.html(name);
+            $(this).hide();
+            $('#changeCurrentName').show()
+            $userName.show();
 
-        localStorage.setItem("Chat userName", JSON.stringify($userName.html()));
+            localStorage.setItem("Chat userName", JSON.stringify($userName.html()));
         };
     })
 
@@ -221,8 +221,8 @@ $(document).ready(function () {
         if (message != "") {
             task = theMessage(message,$userName.html(),appState.messageList.length);
             storeMessages(task,
-             function () {
-            });
+                function () {
+                });
             $('#messageArea').val('');
         };
         document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
@@ -276,7 +276,7 @@ $(document).ready(function () {
             appState.messageList[i].msgText = editer;
 
             return;
-            }
+        }
     })
 
     $('.smile').click(function () {
@@ -318,7 +318,7 @@ function ajax(method, url, data, continueWith, continueWithError) {
     xhr.open(method || 'GET', url, true);
 
     xhr.onload = function () {
-       
+
         if (xhr.readyState != 4)
             return;
 
@@ -344,10 +344,10 @@ function ajax(method, url, data, continueWith, continueWithError) {
 
     xhr.onerror = function (e) {
         var errMsg = 'Server connection error !\n' +
-        '\n' +
-        'Check if \n' +
-        '- server is active\n' +
-        '- server sends header "Access-Control-Allow-Origin:*"';
+            '\n' +
+            'Check if \n' +
+            '- server is active\n' +
+            '- server sends header "Access-Control-Allow-Origin:*"';
 
         continueWithError(errMsg);
     };
