@@ -14,7 +14,7 @@ import java.sql.Statement;
 import bsu.famcs.chat.db.ConnectionManager;
 import bsu.famcs.chat.model.Message;
 
-public class MessageDaoImpl implements MessageDao {
+public  class MessageDaoImpl implements MessageDao {
     private static Logger logger = Logger.getLogger(MessageDaoImpl.class.getName());
 
     @Override
@@ -96,21 +96,19 @@ public class MessageDaoImpl implements MessageDao {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSetMessages = null;
-        ResultSet resultSetUsers = null;
 
         try {
             connection = ConnectionManager.getConnection();
             statement = connection.createStatement();
             resultSetMessages = statement.executeQuery("SELECT * FROM messages");
-            resultSetUsers = statement.executeQuery("SELECT * FROM users");
 
             while (resultSetMessages.next()) {
                 String id = resultSetMessages.getString("id");
                 String msgText= resultSetMessages.getString("msgText");
+                String userName = resultSetMessages.getString("userName");
                 String sendDate = resultSetMessages.getNString("sendDate");
                 String changeDate = resultSetMessages.getString("changeDate");
                 Boolean isDeleted = resultSetMessages.getBoolean("isDeleted");
-                String userName = resultSetUsers.getString(id);
                 messages.add(new Message(id, userName, msgText, sendDate, changeDate, isDeleted));
             }
         } catch (SQLException e) {

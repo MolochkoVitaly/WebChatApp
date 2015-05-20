@@ -4,7 +4,6 @@ import bsu.famcs.chat.model.Message;
 import bsu.famcs.chat.model.MessageStorage;
 import bsu.famcs.chat.storage.xml.XMLHistoryUtil;
 import bsu.famcs.chat.exception.MyException;
-import bsu.famcs.chat.util.MessageUtil;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -24,12 +23,14 @@ import java.io.PrintWriter;
 import static bsu.famcs.chat.util.MessageUtil.*;
 import static bsu.famcs.chat.util.ServletUtil.APPLICATION_JSON;
 import static bsu.famcs.chat.util.ServletUtil.getMessageBody;
+import bsu.famcs.chat.dao.MessageDaoImpl;
 
 @WebServlet("/chat")
 public class MessageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private int isModifiedStorage = 0;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
+    MessageDaoImpl messageDao = new MessageDaoImpl();
 
     @Override
     public void init() throws ServletException {
@@ -71,12 +72,12 @@ public class MessageServlet extends HttpServlet {
             JSONObject json = stringToJson(data);
             Message message = jsonToMessage(json);
             logger.info(message.getUserMessage());
-            XMLHistoryUtil.addMessage(message);
+            //XMLHistoryUtil.addMessage(message);
             MessageStorage.addMessagePost(message);
+            messageDao.add(message);
             isModifiedStorage++;
-            //System.out.println(MessageStorage.getSize());
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
+        } catch (ParseException /*| ParserConfigurationException | SAXException | TransformerException*/ e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
         }
@@ -92,17 +93,18 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
             message.setChangeDate();
-            Message updated = XMLHistoryUtil.updateMessage(message);
-            MessageStorage.addMessagePut(updated);
+            //Message updated = XMLHistoryUtil.updateMessage(message);
+            MessageStorage.addMessagePut(message);
+            messageDao.update(message);
             isModifiedStorage++;
-        } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
+        } catch (ParseException | /*ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |*/
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
-        } catch (MyException e) {
+        } /*catch (MyException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Message with id : " + message.getId() + " doesn't exist or was deleted");
-        }
+        }*/
     }
 
     @Override
@@ -116,16 +118,14 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(json);
             message.isDelete();
             message.setChangeDate();
-            Message updated = XMLHistoryUtil.updateMessage(message);
-            MessageStorage.addMessageDelete(updated);
+            //Message updated = XMLHistoryUtil.updateMessage(message);
+            MessageStorage.addMessageDelete(message);
+            messageDao.update(message);
             isModifiedStorage++;
-        } catch (ParseException | ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |
+        } catch (ParseException /*| ParserConfigurationException | SAXException | XPathExpressionException | TransformerException*/ |
                 NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
-        } catch (MyException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            logger.error("Message with id : " + message.getId() + " doesn't exist or was deleted");
         }
     }
 
@@ -138,7 +138,7 @@ public class MessageServlet extends HttpServlet {
     }
 
 
-    private void loadHistory() throws TransformerException, ParserConfigurationException, IOException,
+    /*private void loadHistory() throws TransformerException, ParserConfigurationException, IOException,
             SAXException {
         if (!XMLHistoryUtil.isStorageExist()) {
             XMLHistoryUtil.createStorage();
@@ -148,5 +148,11 @@ public class MessageServlet extends HttpServlet {
             logger.info('\n' + MessageStorage.getStringView());
             logger.info(MessageStorage.getSubHistory(0));
         }
+    }*/
+    private void loadHistory() throws TransformerException, ParserConfigurationException, IOException,
+    SAXException{
+        MessageStorage.addAll(messageDao.selectAll());
+        logger.info('\n' + MessageStorage.getStringView());
+        logger.info(MessageStorage.getSubHistory(0));
     }
 }
