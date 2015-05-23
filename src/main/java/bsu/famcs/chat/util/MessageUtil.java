@@ -8,7 +8,6 @@ import org.json.simple.parser.ParseException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 public final class MessageUtil {
@@ -22,7 +21,6 @@ public final class MessageUtil {
     private static final String NOT_CHANGED = "not changed";
     private static final String DELETED = "isDeleted";
     private static final String ID = "id";
-    //private static int CURRENT_ID = 0;
 
     private MessageUtil() {
     }
@@ -54,7 +52,6 @@ public final class MessageUtil {
     public static Message jsonToMessage(JSONObject json) {
         String userName = (String)json.get(USER_NAME);
         String msgText = ((String)json.get(MSG_TEXT)).trim();
-        //String id = (String)json.get(ID);
         if (userName != null && msgText != null) {
             Message msg =  new Message(generateId(), userName, msgText, generateCurrentDate(), NOT_CHANGED, false);
             return msg;
