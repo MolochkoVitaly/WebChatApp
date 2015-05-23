@@ -18,11 +18,12 @@ public  class MessageDaoImpl implements MessageDao {
     private static Logger logger = Logger.getLogger(MessageDaoImpl.class.getName());
 
     @Override
-    public void add(Message message) {
+    public void add(Message message) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
             connection = ConnectionManager.getConnection();
+            connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement("INSERT INTO messages (id, userName, msgText, sendDate, changeDate, isDeleted) VALUES (?,?, ?, ?, ?, ?)");
             preparedStatement.setString(1, message.getId());
             preparedStatement.setString(2, message.getUserName());
@@ -31,7 +32,9 @@ public  class MessageDaoImpl implements MessageDao {
             preparedStatement.setString(5, message.getChangeDate());
             preparedStatement.setBoolean(6, message.isDeleted());
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
+            connection.rollback();
             logger.error(e);
         } finally {
             if (preparedStatement != null) {
@@ -53,18 +56,21 @@ public  class MessageDaoImpl implements MessageDao {
     }
 
     @Override
-    public void update(Message message) {
+    public void update(Message message) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
             connection = ConnectionManager.getConnection();
+            connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement("Update messages SET msgText = ?, isDeleted = ?, changeDate = ? WHERE id = ?");
             preparedStatement.setString(1, message.getMsgText());
             preparedStatement.setBoolean(2, message.isDeleted());
             preparedStatement.setString(3, message.getChangeDate());
             preparedStatement.setString(4, message.getId());
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
+            connection.rollback();
             logger.error(e);
         } finally {
             if (preparedStatement != null) {
@@ -91,7 +97,7 @@ public  class MessageDaoImpl implements MessageDao {
     }
 
     @Override
-    public List<Message> selectAll() {
+    public List<Message> selectAll() throws SQLException {
         List<Message> messages = new ArrayList<>();
         Connection connection = null;
         Statement statement = null;
@@ -99,6 +105,7 @@ public  class MessageDaoImpl implements MessageDao {
 
         try {
             connection = ConnectionManager.getConnection();
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             resultSetMessages = statement.executeQuery("SELECT * FROM messages");
 
@@ -111,7 +118,9 @@ public  class MessageDaoImpl implements MessageDao {
                 Boolean isDeleted = resultSetMessages.getBoolean("isDeleted");
                 messages.add(new Message(id, userName, msgText, sendDate, changeDate, isDeleted));
             }
+            connection.commit();
         } catch (SQLException e) {
+            connection.rollback();
             logger.error(e);
         } finally {
             if (resultSetMessages != null) {
