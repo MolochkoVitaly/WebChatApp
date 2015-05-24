@@ -10,27 +10,25 @@ public final class MessageStorage {
     private MessageStorage() {
     }
 
-    public static List<Message> getStorage() {
-        return HISTORY;
-    }
-
     public static void addMessagePost(Message message) {
         HISTORY.add(message);
     }
+
     public static void addMessageDelete(Message message) {
-        for(int i=0; i < HISTORY.size(); i++){
-            if(Integer.parseInt(HISTORY.get(i).getId()) == Integer.parseInt(message.getId())){
-                HISTORY.get(i).setMsgText(message.getMsgText());
-                HISTORY.get(i).isDelete();
-                HISTORY.get(i).setChangeDate();
+        for (Message aHISTORY : HISTORY) {
+            if (Integer.parseInt(aHISTORY.getId()) == Integer.parseInt(message.getId())) {
+                aHISTORY.setMsgText(message.getMsgText());
+                aHISTORY.isDelete();
+                aHISTORY.setChangeDate();
             }
         }
     }
+
     public static void addMessagePut(Message message) {
-        for(int i=0; i < HISTORY.size(); i++){
-            if(Integer.parseInt(HISTORY.get(i).getId()) == Integer.parseInt(message.getId())){
-                HISTORY.get(i).setMsgText(message.getMsgText());
-                HISTORY.get(i).setChangeDate();
+        for (Message aHISTORY : HISTORY) {
+            if (Integer.parseInt(aHISTORY.getId()) == Integer.parseInt(message.getId())) {
+                aHISTORY.setMsgText(message.getMsgText());
+                aHISTORY.setChangeDate();
             }
         }
     }
@@ -47,21 +45,12 @@ public final class MessageStorage {
         return HISTORY.subList(index, HISTORY.size());
     }
 
-    public static Message getMessageById(String id) {
-        for (Message message : HISTORY) {
-            if (id.equals(message.getId())) {
-                return message;
-            }
-        }
-        return null;
-    }
-
     public static int countOfMessages(int index){
         return HISTORY.subList(index, HISTORY.size()).size();
     }
 
     public static String getStringView() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Message message : HISTORY) {
             sb.append(message.getUserMessage());
             sb.append('\n');

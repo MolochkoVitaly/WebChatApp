@@ -58,22 +58,10 @@ public class Message {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"msgText\":\"").append(msgText)
-                .append("\", \"userName\":\"").append(userName)
-                .append("\", \"id\":\"").append(id)
-                .append("\", \"sendDate\":\"").append(sendDate)
-                .append("\", \"changeDate\":\"").append(changeDate)
-                .append("\", \"isDeleted\":\"").append(isDeleted).append("\"}");
-        return sb.toString();
+        return "{\"msgText\":\"" + msgText + "\", \"userName\":\"" + userName + "\", \"id\":\"" + id + "\", \"sendDate\":\"" + sendDate + "\", \"changeDate\":\"" + changeDate + "\", \"isDeleted\":\"" + isDeleted + "\"}";
     }
 
     public String getUserMessage() {
-        StringBuilder sb = new StringBuilder(getSendDate());
-        sb.append(' ')
-                .append(userName)
-                .append(" : ")
-                .append(getMsgText());
-        return sb.toString();
+        return getSendDate() + ' ' + userName + " : " + getMsgText();
     }
 }

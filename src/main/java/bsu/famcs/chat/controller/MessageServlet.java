@@ -2,8 +2,6 @@ package bsu.famcs.chat.controller;
 
 import bsu.famcs.chat.model.Message;
 import bsu.famcs.chat.model.MessageStorage;
-import bsu.famcs.chat.storage.xml.XMLHistoryUtil;
-import bsu.famcs.chat.exception.MyException;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -16,13 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
 import static bsu.famcs.chat.util.MessageUtil.*;
 import static bsu.famcs.chat.util.ServletUtil.APPLICATION_JSON;
+import static bsu.famcs.chat.util.ServletUtil.UTF_8;
 import static bsu.famcs.chat.util.ServletUtil.getMessageBody;
 import bsu.famcs.chat.dao.MessageDaoImpl;
 
@@ -52,6 +50,7 @@ public class MessageServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
             }else {
                      String messages = serverResponse(index);
+                     response.setContentType(UTF_8);
                      response.setContentType(APPLICATION_JSON);
                      PrintWriter out = response.getWriter();
                      out.print(messages);
@@ -88,7 +87,7 @@ public class MessageServlet extends HttpServlet {
         logger.info("Put request");
         String data = getMessageBody(request);
         logger.info("Request data : " + data);
-        Message message = null;
+        Message message;
         try {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
@@ -108,7 +107,7 @@ public class MessageServlet extends HttpServlet {
         logger.info("Delete request");
         String data = getMessageBody(request);
         logger.info("Request data : " + data);
-        Message message = null;
+        Message message;
         try {
             JSONObject json = stringToJson(data);
             message = jsonToCurrentMessage(json);

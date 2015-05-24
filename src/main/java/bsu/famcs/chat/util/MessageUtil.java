@@ -52,9 +52,8 @@ public final class MessageUtil {
     public static Message jsonToMessage(JSONObject json) {
         String userName = (String)json.get(USER_NAME);
         String msgText = ((String)json.get(MSG_TEXT)).trim();
-        if (userName != null && msgText != null) {
-            Message msg =  new Message(generateId(), userName, msgText, generateCurrentDate(), NOT_CHANGED, false);
-            return msg;
+        if (userName != null) {
+            return new Message(generateId(), userName, msgText, generateCurrentDate(), NOT_CHANGED, false);
         }
         return null;
     }
