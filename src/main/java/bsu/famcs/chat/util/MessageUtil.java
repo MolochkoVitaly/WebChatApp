@@ -26,12 +26,12 @@ public final class MessageUtil {
     }
 
     public static String getToken(int index) {
-        Integer number = index;
+        Integer number = index * 8 + 11;
         return TN + number + EN;
     }
 
     public static int getIndex(String token) {
-        return (Integer.valueOf(token.substring(2, token.length() - 2)));
+        return (Integer.valueOf(token.substring(2, token.length() - 2)) - 11) / 8;
     }
 
     private static String generateId() {

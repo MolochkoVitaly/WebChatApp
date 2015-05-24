@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 import static bsu.famcs.chat.util.MessageUtil.*;
 import static bsu.famcs.chat.util.ServletUtil.APPLICATION_JSON;
@@ -28,7 +29,6 @@ import bsu.famcs.chat.dao.MessageDaoImpl;
 @WebServlet("/chat")
 public class MessageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private int isModifiedStorage = 0;
     private static Logger logger = Logger.getLogger(MessageServlet.class.getName());
     MessageDaoImpl messageDao = new MessageDaoImpl();
 
@@ -36,7 +36,7 @@ public class MessageServlet extends HttpServlet {
     public void init() throws ServletException {
         try {
             loadHistory();
-        } catch (TransformerException | ParserConfigurationException | IOException | SAXException e) {
+        } catch (TransformerException | ParserConfigurationException | IOException | SAXException | SQLException e) {
             logger.error(e);
         }
     }
@@ -47,16 +47,16 @@ public class MessageServlet extends HttpServlet {
         logger.info("Get request");
         if (token != null && !"".equals(token)) {
             int index = getIndex(token);
-            if(isModifiedStorage == index && isModifiedStorage != 0) {
+            if(MessageStorage.countOfMessages(index)==0){
                 logger.info("GET request: response status: 304 Not Modified");
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-            } else {
-                String messages = serverResponse(0);
-                response.setContentType(APPLICATION_JSON);
-                PrintWriter out = response.getWriter();
-                out.print(messages);
-                out.flush();
-            }
+            }else {
+                     String messages = serverResponse(index);
+                     response.setContentType(APPLICATION_JSON);
+                     PrintWriter out = response.getWriter();
+                     out.print(messages);
+                     out.flush();
+                  }
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "token parameter is absent");
             logger.error("Token parameter is absent");
@@ -72,14 +72,14 @@ public class MessageServlet extends HttpServlet {
             JSONObject json = stringToJson(data);
             Message message = jsonToMessage(json);
             logger.info(message.getUserMessage());
-            //XMLHistoryUtil.addMessage(message);
             MessageStorage.addMessagePost(message);
             messageDao.add(message);
-            isModifiedStorage++;
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException /*| ParserConfigurationException | SAXException | TransformerException*/ e) {
+        } catch (ParseException  e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
+        } catch (SQLException e) {
+            logger.error(e);
         }
     }
 
@@ -93,18 +93,14 @@ public class MessageServlet extends HttpServlet {
             JSONObject jsonObject = stringToJson(data);
             message = jsonToCurrentMessage(jsonObject);
             message.setChangeDate();
-            //Message updated = XMLHistoryUtil.updateMessage(message);
             MessageStorage.addMessagePut(message);
             messageDao.update(message);
-            isModifiedStorage++;
-        } catch (ParseException | /*ParserConfigurationException | SAXException | XPathExpressionException | TransformerException |*/
-                NullPointerException e) {
+        } catch (ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
-        } /*catch (MyException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            logger.error("Message with id : " + message.getId() + " doesn't exist or was deleted");
-        }*/
+        } catch (SQLException e) {
+            logger.error(e);
+        }
     }
 
     @Override
@@ -118,14 +114,13 @@ public class MessageServlet extends HttpServlet {
             message = jsonToCurrentMessage(json);
             message.isDelete();
             message.setChangeDate();
-            //Message updated = XMLHistoryUtil.updateMessage(message);
             MessageStorage.addMessageDelete(message);
             messageDao.update(message);
-            isModifiedStorage++;
-        } catch (ParseException /*| ParserConfigurationException | SAXException | XPathExpressionException | TransformerException*/ |
-                NullPointerException e) {
+        } catch (ParseException | NullPointerException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             logger.error("Invalid message");
+        } catch (SQLException e) {
+            logger.error(e);
         }
     }
 
@@ -133,24 +128,12 @@ public class MessageServlet extends HttpServlet {
     private String serverResponse(int index) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(MESSAGES, MessageStorage.getSubHistory(index));
-        jsonObject.put(TOKEN, getToken(isModifiedStorage));
+        jsonObject.put(TOKEN, getToken(MessageStorage.getSize()));
         return jsonObject.toJSONString();
     }
 
-
-    /*private void loadHistory() throws TransformerException, ParserConfigurationException, IOException,
-            SAXException {
-        if (!XMLHistoryUtil.isStorageExist()) {
-            XMLHistoryUtil.createStorage();
-            logger.info(MessageStorage.getSubHistory(0));
-        } else {
-            MessageStorage.addAll(XMLHistoryUtil.getMessages());
-            logger.info('\n' + MessageStorage.getStringView());
-            logger.info(MessageStorage.getSubHistory(0));
-        }
-    }*/
     private void loadHistory() throws TransformerException, ParserConfigurationException, IOException,
-    SAXException{
+            SAXException, SQLException {
         MessageStorage.addAll(messageDao.selectAll());
         logger.info('\n' + MessageStorage.getStringView());
         logger.info(MessageStorage.getSubHistory(0));

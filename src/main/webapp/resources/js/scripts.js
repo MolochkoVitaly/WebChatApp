@@ -16,14 +16,14 @@ var theMessage = function(text, user , value) {
 var appState = {
     mainUrl: 'chat',
     messageList:[],
-    token: 'TE0EN'
+    token: 'TE11EN'
 };
 
 function storeMessages(sendMessage, continueWith) {
     post(appState.mainUrl, JSON.stringify(sendMessage),
         function () {
         });
-}
+};
 
 
 function restoreMessages(continueWith) {
@@ -33,13 +33,12 @@ function restoreMessages(continueWith) {
         console.assert(responseText != null);
         delegateEventServer();
         var response = JSON.parse(responseText);
-
         createAllTasks(response.messages);
 
         continueWith && continueWith();
     });
     document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
-}
+};
 
 function updateMessages(continueWith) {
     var url = appState.mainUrl + '?token=' + appState.token;
@@ -66,14 +65,14 @@ function updateMessages(continueWith) {
     });
     setTimeout(updateMessages, 1000);
     document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
-}
+};
 
 function createAllTasks(allTasks) {
     for(var i = 0; i < allTasks.length; i++){
         addAllMessages(allTasks[i]);
     }
     document.getElementById("showMessage").scrollTop = document.getElementById("showMessage").scrollHeight;
-}
+};
 
 function addAllMessages(message) {
     if (appState.messageList[parseInt(message.id, 10)] == null) {
@@ -85,14 +84,14 @@ function addAllMessages(message) {
         $('#showMessage').append(messageDiv.show());
         appState.messageList.push(message);
     }
-}
+};
 
 function addChangeMessage(message) {
     if (appState.messageList[message.id] != null) {
         $('.exampleMessage').find('.message')[parseInt(message.id,10) + 1].innerText=message.msgText;
         appState.messageList[message.id] = message;
     }
-}
+};
 
 function addDeleteMessage(message) {
     if (appState.messageList[message.id] != null) {
@@ -104,12 +103,12 @@ function addDeleteMessage(message) {
 function delegateEventServer(evtObj) {
     $("#server").removeClass('btn btn-danger');
     $("#server").addClass('btn btn-success');
-}
+};
 
 function defaultErrorHandler(message) {
     $("#server").removeClass('btn btn-success');
     $("#server").addClass('btn btn-danger');
-}
+};
 
 
 function restoreName(){
@@ -125,21 +124,25 @@ function restoreName(){
     $('#send').attr('disabled', false);
 
     return item && JSON.parse(item);
-}
+};
 
-function changeMessages(changeMessage, continueWith) {
-    put(appState.mainUrl, JSON.stringify(changeMessage), function () {
+function changeMessages(index, changeMessage, continueWith) {
+    var indexToken = index * 8 + 11;
+    appState.token = "TN" + indexToken + "EN";
+    var url = appState.mainUrl + '?token=' + appState.token;
+    put(url, JSON.stringify(changeMessage), function () {
     });
-}
+};
 
 function deleteMessage(index, msg, continueWith) {
-    var indexToken = index;
+    var indexToken = index*8+11;
+    appState.token = "TN" + indexToken + "EN";
     var url = appState.mainUrl + '?token=' + "TN" +indexToken.toString() + "EN";
     del(url, JSON.stringify(msg), function () {
 
         continueWith && continueWith();
     });
-}
+};
 
 $(document).ready(function () {
 
@@ -261,7 +264,7 @@ $(document).ready(function () {
         $input.hide();
         id = $(this).closest('.exampleMessage').attr('message-id');
         task = theMessage(editer,$p.find('.nick').html(),id);
-        changeMessages(task, function(){
+        changeMessages(id, task, function(){
         });
         $p.find('.message').show();
         $p.find('.nick').show();
@@ -289,16 +292,16 @@ $(document).ready(function () {
 
 function get(url, continueWith, continueWithError) {
     ajax('GET', url, null, continueWith, continueWithError);
-}
+};
 function post(url, data, continueWith, continueWithError) {
     ajax('POST', url, data, continueWith, continueWithError);
-}
+};
 function put(url, data, continueWith, continueWithError) {
     ajax('PUT', url, data, continueWith, continueWithError);
-}
+};
 function del(url, data, continueWith, continueWithError) {
     ajax('DELETE', url, data, continueWith, continueWithError);
-}
+};
 function isError(text) {
     if (text == "")
         return false;
@@ -310,7 +313,7 @@ function isError(text) {
     }
 
     return !!obj.error;
-}
+};
 function ajax(method, url, data, continueWith, continueWithError) {
     var xhr = new XMLHttpRequest();
 
@@ -353,4 +356,4 @@ function ajax(method, url, data, continueWith, continueWithError) {
     };
 
     xhr.send(data);
-}
+};

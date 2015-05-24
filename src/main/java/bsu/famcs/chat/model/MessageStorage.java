@@ -56,6 +56,10 @@ public final class MessageStorage {
         return null;
     }
 
+    public static int countOfMessages(int index){
+        return HISTORY.subList(index, HISTORY.size()).size();
+    }
+
     public static String getStringView() {
         StringBuffer sb = new StringBuffer();
         for (Message message : HISTORY) {
